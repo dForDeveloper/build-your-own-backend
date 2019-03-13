@@ -1,4 +1,4 @@
-const sets = require('../../../sets');
+const sets = require('../../../Vintage');
 
 exports.seed = async (knex, Promise) => {
   await knex('cards').del();
@@ -32,15 +32,31 @@ const createSet = async (knex, set) => {
           black: card.colors.includes('B'),
           red: card.colors.includes('R'),
           green: card.colors.includes('G'),
-          type: card.type,
+          supertype: card.supertypes[0],
+          artifact: card.types.includes('Artifact'),
+          creature: card.types.includes('Creature'),
+          enchantment: card.types.includes('Enchantment'),
+          instant: card.types.includes('Instant'),
+          land: card.types.includes('Land'),
+          planeswalker: card.types.includes('Planeswalker'),
+          sorcery: card.types.includes('Sorcery'),
+          tribal: card.types.includes('Tribal'),
+          subtype: card.subtypes.join(' '),
+          set_name: set.name,
+          set_code: set.code,
           rarity: card.rarity,
-          rules_text: card.originalText,
+          rules_text: card.text,
           loyalty: card.loyalty,
           power: card.power,
           toughness: card.toughness,
           collector_number: card.number,
           artist: card.artist,
           layout: card.layout,
+          commander: card.legalities.commander,
+          legacy: card.legalities.legacy,
+          modern: card.legalities.modern,
+          standard: card.legalities.standard,
+          vintage: card.legalities.vintage,
           set_id: id[0]
         }
       )
