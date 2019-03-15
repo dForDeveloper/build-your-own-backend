@@ -6,5 +6,6 @@ router.get('/sets', db.getAllSets);
 router.get('/cards?', db.getCardsByQuery);
 router.get('/cards', db.getAllCards);
 router.post('/cards', db.postToCards);
+router.post('/sets', db.postToSets);
 
 module.exports = router;

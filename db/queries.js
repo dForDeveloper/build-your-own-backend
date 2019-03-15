@@ -3,41 +3,48 @@ const configuration = require('../knexfile')[environment];
 const db = require('knex')(configuration);
 
 const cardsSchema = {
-  'name': '<string>',
-  'mana_cost': '<string>',
-  'cmc': '<integer>',
-  'colorless': '<boolean>',
-  'white': '<boolean>',
-  'blue': '<boolean>',
-  'black': '<boolean>',
-  'red': '<boolean>',
-  'green': '<boolean>',
-  'supertype': '<string>',
-  'artifact': '<boolean>',
-  'creature': '<boolean>',
-  'enchantment': '<boolean>',
-  'instant': '<boolean>',
-  'land': '<boolean>',
-  'planeswalker': '<boolean>',
-  'sorcery': '<boolean>',
-  'tribal': '<boolean>',
-  'subtype': '<string>',
-  'set_name': '<string>',
-  'set_code': '<string>',
-  'rarity': '<string>',
-  'rules_text': '<string>',
-  'loyalty': '<string>',
-  'power': '<string>',
-  'toughness': '<string>',
-  'collector_number': '<string>',
-  'artist': '<string>',
-  'layout': '<string>',
-  'commander': '<string>',
-  'legacy': '<string>',
-  'modern': '<string>',
-  'standard': '<string>',
-  'vintage': '<string>'
+  name: '<string>',
+  mana_cost: '<string>',
+  cmc: '<integer>',
+  colorless: '<boolean>',
+  white: '<boolean>',
+  blue: '<boolean>',
+  black: '<boolean>',
+  red: '<boolean>',
+  green: '<boolean>',
+  supertype: '<string>',
+  artifact: '<boolean>',
+  creature: '<boolean>',
+  enchantment: '<boolean>',
+  instant: '<boolean>',
+  land: '<boolean>',
+  planeswalker: '<boolean>',
+  sorcery: '<boolean>',
+  tribal: '<boolean>',
+  subtype: '<string>',
+  set_name: '<string>',
+  set_code: '<string>',
+  rarity: '<string>',
+  rules_text: '<string>',
+  loyalty: '<string>',
+  power: '<string>',
+  toughness: '<string>',
+  collector_number: '<string>',
+  artist: '<string>',
+  layout: '<string>',
+  commander: '<string>',
+  legacy: '<string>',
+  modern: '<string>',
+  standard: '<string>',
+  vintage: '<string>'
 };
+
+const setsSchema = {
+  name: '<string>',
+  code: '<string>',
+  set_size: '<integer>',
+  release_date: '<string>'
+}
 
 const stringify = (schema) => {
   return Object.keys(schema).reduce((result, key, index, array) => {
@@ -98,9 +105,27 @@ const postToCards = async (req, res) => {
   }
 }
 
+const postToSets = async (req, res) => {
+  const set = req.body;
+  for(let param of Object.keys(setsSchema)) {
+    if (!set[param]) {
+      return res.status(422).send({
+        error: `Expected format: {${stringify(setsSchema)} }. Missing ${param}`
+      });
+    }
+  }
+  try {
+    const [id] = await db('sets').insert(set, 'id');
+    res.status(201).json({ id });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
 module.exports = {
   getAllSets,
   getAllCards,
   getCardsByQuery,
-  postToCards
+  postToCards,
+  postToSets
 }
