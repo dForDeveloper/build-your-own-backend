@@ -9,5 +9,6 @@ router.get('/cards', db.getAllCards);
 router.get('/cards/:id', db.getCardByID);
 router.post('/cards', db.postToCards);
 router.post('/sets', db.postToSets);
+router.delete('/cards/:id', db.deleteCardByID);
 
 module.exports = router;

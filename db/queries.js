@@ -149,6 +149,18 @@ const postToCards = async (req, res) => {
   }
 }
 
+const deleteCardByID = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cards = await db('cards').select().where({ id });
+    if (cards.length === 0) return res.sendStatus(404);
+    await db('cards').where({ id }).del();
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
 module.exports = {
   getAllSets,
   getSetByID,
@@ -156,5 +168,6 @@ module.exports = {
   getCardByID,
   getCardsByQuery,
   postToCards,
-  postToSets
+  postToSets,
+  deleteCardByID
 }
