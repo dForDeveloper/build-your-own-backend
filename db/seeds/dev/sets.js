@@ -1,6 +1,8 @@
-const sets = require('../../../Vintage');
+const fetch = require('node-fetch');
 
 exports.seed = async (knex, Promise) => {
+  const response = await fetch('https://mtgjson.com/json/Vintage.json');
+  const sets = await response.json();
   await knex('cards').del();
   await knex('sets').del();
   const setPromises = [];
