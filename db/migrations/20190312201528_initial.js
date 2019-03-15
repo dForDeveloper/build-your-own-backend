@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
       table.string('name');
       table.string('code');
       table.integer('set_size');
-      table.date('release_date');
+      table.string('release_date');
       table.timestamps(true, true);
     }),
     knex.schema.createTable('cards', function(table) {
