@@ -36,7 +36,8 @@ const cardsSchema = {
   legacy: '<string>',
   modern: '<string>',
   standard: '<string>',
-  vintage: '<string>'
+  vintage: '<string>',
+  set_id: '<integer>'
 };
 
 const setsSchema = {
@@ -108,23 +109,6 @@ const getCardsByQuery = async (req, res) => {
   }
 }
 
-const postToCards = async (req, res) => {
-  const card = req.body;
-  for(let param of Object.keys(cardsSchema)) {
-    if (!card[param]) {
-      return res.status(422).send({
-        error: `Expected format: {${stringify(cardsSchema)} }. Missing ${param}`
-      });
-    }
-  }
-  try {
-    const [id] = await db('cards').insert(card, 'id');
-    res.status(201).json({ id });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-}
-
 const postToSets = async (req, res) => {
   const set = req.body;
   for(let param of Object.keys(setsSchema)) {
@@ -136,6 +120,29 @@ const postToSets = async (req, res) => {
   }
   try {
     const [id] = await db('sets').insert(set, 'id');
+    res.status(201).json({ id });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
+const postToCards = async (req, res) => {
+  const card = req.body;
+  for(let param of Object.keys(cardsSchema)) {
+    if (!card[param]) {
+      return res.status(422).send({
+        error: `Expected format: {${stringify(cardsSchema)} }. Missing ${param}`
+      });
+    }
+  }
+  const sets = await db('sets').select();
+  if (parseInt(card.set_id) < 1 || parseInt(card.set_id) > sets.length) {
+    return res.status(422).send({
+      error: `set_id must be between 1 and ${sets.length} inclusive`
+    });
+  }
+  try {
+    const [id] = await db('cards').insert(card, 'id');
     res.status(201).json({ id });
   } catch (error) {
     res.status(500).json(error);
