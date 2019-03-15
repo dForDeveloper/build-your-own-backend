@@ -2,43 +2,50 @@ const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[environment];
 const db = require('knex')(configuration);
 
-const cardsSchema = [
-  'id',
-  'name',
-  'mana_cost',
-  'cmc',
-  'colorless',
-  'white',
-  'blue',
-  'black',
-  'red',
-  'green',
-  'supertype',
-  'artifact',
-  'creature',
-  'enchantment',
-  'instant',
-  'land',
-  'planeswalker',
-  'sorcery',
-  'tribal',
-  'subtype',
-  'set_name',
-  'set_code',
-  'rarity',
-  'rules_text',
-  'loyalty',
-  'power',
-  'toughness',
-  'collector_number',
-  'artist',
-  'layout',
-  'commander',
-  'legacy',
-  'modern',
-  'standard',
-  'vintage'
-];
+const cardsSchema = {
+  'name': '<string>',
+  'mana_cost': '<string>',
+  'cmc': '<integer>',
+  'colorless': '<boolean>',
+  'white': '<boolean>',
+  'blue': '<boolean>',
+  'black': '<boolean>',
+  'red': '<boolean>',
+  'green': '<boolean>',
+  'supertype': '<string>',
+  'artifact': '<boolean>',
+  'creature': '<boolean>',
+  'enchantment': '<boolean>',
+  'instant': '<boolean>',
+  'land': '<boolean>',
+  'planeswalker': '<boolean>',
+  'sorcery': '<boolean>',
+  'tribal': '<boolean>',
+  'subtype': '<string>',
+  'set_name': '<string>',
+  'set_code': '<string>',
+  'rarity': '<string>',
+  'rules_text': '<string>',
+  'loyalty': '<string>',
+  'power': '<string>',
+  'toughness': '<string>',
+  'collector_number': '<string>',
+  'artist': '<string>',
+  'layout': '<string>',
+  'commander': '<string>',
+  'legacy': '<string>',
+  'modern': '<string>',
+  'standard': '<string>',
+  'vintage': '<string>'
+};
+
+const stringify = (schema) => {
+  return Object.keys(schema).reduce((result, key, index, array) => {
+    result += ` ${key}: ${schema[key]}`;
+    if (index !== array.length - 1) result += ','
+    return result;
+  }, '');
+}
 
 const getAllSets = async (req, res) => {
   try {
@@ -59,10 +66,12 @@ const getAllCards = async (req, res) => {
 }
 
 const getCardsByQuery = async (req, res) => {
-  if (Object.keys(req.query).some(param => !cardsSchema.includes(param))) {
-    return res.status(422).json(
-      `Bad request. Valid query parameters are ${cardsSchema}`
-    );
+  const queryParams = Object.keys(req.query);
+  const validParams = Object.keys(cardsSchema);
+  if (queryParams.some(param => !validParams.includes(param))) {
+    return res.status(422).send({
+      error: `Bad request. Valid parameters are {${stringify(cardsSchema)} }`
+    });
   }
   try {
     const cards = await db('cards').select().where(req.query);
@@ -72,8 +81,26 @@ const getCardsByQuery = async (req, res) => {
   }
 }
 
+const postToCards = async (req, res) => {
+  const card = req.body;
+  for(let param of Object.keys(cardsSchema)) {
+    if (!card[param]) {
+      return res.status(422).send({
+        error: `Expected format: {${stringify(cardsSchema)} }. Missing ${param}`
+      });
+    }
+  }
+  try {
+    const [id] = await db('cards').insert(card, 'id');
+    res.status(201).json({ id });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
 module.exports = {
   getAllSets,
   getAllCards,
-  getCardsByQuery
+  getCardsByQuery,
+  postToCards
 }
