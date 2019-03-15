@@ -63,6 +63,16 @@ const getAllSets = async (req, res) => {
   }
 }
 
+const getSetByID = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const set = await db('sets').select().where({ id });
+    res.status(200).json(set);
+  } catch (error) {
+    res.sendStatus(404);
+  }
+}
+
 const getAllCards = async (req, res) => {
   try {
     const sets = await db('cards').select();
@@ -124,6 +134,7 @@ const postToSets = async (req, res) => {
 
 module.exports = {
   getAllSets,
+  getSetByID,
   getAllCards,
   getCardsByQuery,
   postToCards,
