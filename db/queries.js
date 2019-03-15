@@ -56,8 +56,9 @@ const stringify = (schema) => {
 }
 
 const getAllSets = async (req, res) => {
+  const params = Object.keys(setsSchema);
   try {
-    const sets = await db('sets').select();
+    const sets = await db('sets').column(['id', ...params]).select();
     res.status(200).json(sets);
   } catch (error) {
     res.status(500).json(error);
@@ -65,9 +66,10 @@ const getAllSets = async (req, res) => {
 }
 
 const getSetByID = async (req, res) => {
+  const params = Object.keys(setsSchema);
   const { id } = req.params;
   try {
-    const sets = await db('sets').select().where({ id });
+    const sets = await db('sets').column(['id', ...params]).select().where({ id });
     return sets.length > 0 ? res.status(200).json(sets) : res.sendStatus(404);
   } catch (error) {
     res.status(500).json(error);
@@ -75,8 +77,9 @@ const getSetByID = async (req, res) => {
 }
 
 const getAllCards = async (req, res) => {
+  const params = Object.keys(cardsSchema);
   try {
-    const sets = await db('cards').select();
+    const sets = await db('cards').column(['id', ...params]).select();
     res.status(200).json(sets);
   } catch (error) {
     res.status(500).json(error);
@@ -84,9 +87,10 @@ const getAllCards = async (req, res) => {
 }
 
 const getCardByID = async (req, res) => {
+  const params = Object.keys(cardsSchema);
   const { id } = req.params;
   try {
-    const cards = await db('cards').select().where({ id });
+    const cards = await db('cards').column(['id', ...params]).select().where({ id });
     return cards.length > 0 ? res.status(200).json(cards) : res.sendStatus(404);
   } catch (error) {
     res.status(500).json(error);
@@ -94,6 +98,7 @@ const getCardByID = async (req, res) => {
 }
 
 const getCardsByQuery = async (req, res) => {
+  const params = Object.keys(cardsSchema);
   const queryParams = Object.keys(req.query);
   const validParams = Object.keys(cardsSchema);
   if (queryParams.some(param => !validParams.includes(param))) {
@@ -102,7 +107,7 @@ const getCardsByQuery = async (req, res) => {
     });
   }
   try {
-    const cards = await db('cards').select().where(req.query);
+    const cards = await db('cards').column(['id', ...params]).select().where(req.query);
     res.status(200).json(cards);
   } catch (error) {
     res.status(500).json(error);
